@@ -7,6 +7,7 @@ import {
   BackgroundVariant,
   ConnectionMode,
   MarkerType,
+  SelectionMode,
   type ReactFlowInstance,
 } from '@xyflow/react'
 import { useFlowStore } from '@/store/use-flow-store'
@@ -106,9 +107,13 @@ export function DesignCanvas() {
         edgeTypes={edgeTypes}
         defaultEdgeOptions={defaultEdgeOptions}
         connectionMode={ConnectionMode.Loose}
+        panOnDrag={false}
+        selectionOnDrag={true}
+        selectionMode={SelectionMode.Partial}
+        panOnScroll={true}
         fitView
         deleteKeyCode={['Backspace', 'Delete']}
-        multiSelectionKeyCode="Shift"
+        multiSelectionKeyCode={['Shift', 'Meta', 'Control']}
         snapToGrid
         snapGrid={[16, 16]}
         minZoom={0.1}
