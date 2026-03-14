@@ -1,4 +1,6 @@
 import type { SystemNode, SystemEdge } from '@/types'
+import { MarkerType } from '@xyflow/react'
+import { CONNECTION_TYPE_STYLES } from '@/types'
 
 export interface DesignTemplate {
   id: string
@@ -35,13 +37,20 @@ function edge(
   protocol: string,
   connectionType: 'sync' | 'async' | 'streaming',
   latencyMs: number,
+  sourceHandle: string = 'right',
+  targetHandle: string = 'left',
 ): SystemEdge {
+  const color = CONNECTION_TYPE_STYLES[connectionType]?.color ?? '#6366f1'
+
   return {
     id,
     source,
     target,
+    sourceHandle,
+    targetHandle,
     type: 'typed-edge',
     data: { label, protocol, connectionType, latencyMs },
+    markerEnd: { type: MarkerType.ArrowClosed, width: 15, height: 15, color },
   }
 }
 

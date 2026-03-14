@@ -6,6 +6,7 @@ import {
   MiniMap,
   BackgroundVariant,
   ConnectionMode,
+  MarkerType,
   type ReactFlowInstance,
 } from '@xyflow/react'
 import { useFlowStore } from '@/store/use-flow-store'
@@ -42,7 +43,11 @@ export function DesignCanvas() {
   const rfInstance = useRef<ReactFlowInstance<SystemNode, SystemEdge> | null>(null)
 
   const defaultEdgeOptions = useMemo(
-    () => ({ type: 'typed-edge', data: { label: '', protocol: '', connectionType: 'sync' as const, latencyMs: 10 } }),
+    () => ({
+      type: 'typed-edge',
+      data: { label: '', protocol: '', connectionType: 'sync' as const, latencyMs: 10 },
+      markerEnd: { type: MarkerType.ArrowClosed, width: 15, height: 15, color: '#6366f1' },
+    }),
     []
   )
 
