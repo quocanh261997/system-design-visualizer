@@ -64,17 +64,25 @@ body {
   stroke: var(--color-accent);
 }
 
-.react-flow__handle {
+.react-flow__node .react-flow__handle {
   width: 8px !important;
   height: 8px !important;
   background-color: var(--color-text-muted) !important;
   border: 2px solid var(--color-node-bg) !important;
+  opacity: 0;
+  transition: opacity 0.2s ease, background-color 0.2s ease;
 }
 
-.react-flow__handle:hover {
+.react-flow__node:hover .react-flow__handle {
+  opacity: 1;
+}
+
+.react-flow__node .react-flow__handle:hover {
   background-color: var(--color-accent) !important;
 }
 
-.react-flow__pane {
-  cursor: default !important;
+.react-flow__node-group {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
 }

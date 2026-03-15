@@ -35,6 +35,7 @@ interface FlowState {
   toggleNodeExpanded: (nodeId: string) => void
   deleteSelected: () => void
   addGroup: (position: { x: number; y: number }, groupType?: string, label?: string) => void
+  addTextNode: (position: { x: number; y: number }, text: string) => void
   setProjectName: (name: string) => void
   loadProject: (nodes: SystemNode[], edges: SystemEdge[], name?: string) => void
   clear: () => void
@@ -179,6 +180,20 @@ export const useFlowStore = create<FlowState>((set, get) => ({
       style: { width: 400, height: 300 },
     }
     set({ nodes: [...get().nodes, node] })
+  },
+
+  addTextNode: (position, text) => {
+    const node: SystemNode = {
+      id: `text-${uuid()}`,
+      type: 'text' as any, // bypassing strict type momentarily or using the updated union
+      position,
+      data: {
+        componentType: 'text',
+        label: text,
+        config: {},
+      },
+    }
+    set({ nodes: [...get().nodes, node as SystemNode] })
   },
 
   setProjectName: (name) => set({ projectName: name }),

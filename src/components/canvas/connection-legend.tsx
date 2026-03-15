@@ -1,4 +1,5 @@
 import { CONNECTION_TYPE_STYLES, type ConnectionType } from '@/types'
+import { useFlowStore } from '@/store/use-flow-store'
 
 const LEGEND_ENTRIES: { type: ConnectionType; dash?: string }[] = [
   { type: 'sync' },
@@ -9,6 +10,10 @@ const LEGEND_ENTRIES: { type: ConnectionType; dash?: string }[] = [
 
 /** Compact legend overlay showing connection type color/style mapping */
 export function ConnectionLegend() {
+  const edges = useFlowStore((s) => s.edges)
+  
+  if (edges.length === 0) return null
+
   return (
     <div
       className="absolute top-3 right-3 z-10 px-3 py-2 rounded-lg text-[10px]"

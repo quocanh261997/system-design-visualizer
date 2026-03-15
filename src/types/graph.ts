@@ -52,7 +52,7 @@ export interface SystemEdgeData {
   [key: string]: unknown
 }
 
-export type SystemNode = Node<SystemNodeData, 'system-component' | 'group' | 'decision-gateway'>
+export type SystemNode = Node<SystemNodeData, 'system-component' | 'group' | 'decision-gateway' | 'text'>
 export type SystemEdge = Edge<SystemEdgeData>
 
 /** A single step in a simulation run */
