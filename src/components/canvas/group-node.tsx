@@ -20,12 +20,10 @@ function GroupNodeComponent({ id, data, selected }: NodeProps<SystemNode>) {
   const style = GROUP_STYLES[groupType] ?? GROUP_STYLES.service
 
   const [isEditing, setIsEditing] = useState(false)
-  const [editValue, setEditValue] = useState(data.label)
+  const [editValueState, setEditValue] = useState(data.label)
   const inputRef = useRef<HTMLInputElement>(null)
 
-  useEffect(() => {
-    if (!isEditing) setEditValue(data.label)
-  }, [data.label, isEditing])
+  const editValue = isEditing ? editValueState : data.label
 
   useEffect(() => {
     if (isEditing && inputRef.current) {

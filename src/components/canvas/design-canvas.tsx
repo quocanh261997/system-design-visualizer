@@ -104,7 +104,7 @@ export function DesignCanvas() {
     return () => {
       if (wrapper) wrapper.removeEventListener('dblclick', handleNativeDblClick)
     }
-  }, [addTextNode])
+  }, [addTextNode, snapshot])
 
   /** Handle drop from palette sidebar */
   const onDragOver = useCallback((event: React.DragEvent) => {
@@ -129,7 +129,7 @@ export function DesignCanvas() {
   )
 
   /** Handle single clicks on empty canvas */
-  const onPaneClick = useCallback((_event: React.MouseEvent) => {
+  const onPaneClick = useCallback(() => {
     // Normal single click: deselect
     setSelectedNode(null)
     setSelectedEdge(null)
