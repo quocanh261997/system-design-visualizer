@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react'
-import { Search } from 'lucide-react'
+import { Search, PanelLeftClose, PanelLeftOpen } from 'lucide-react'
 import {
   componentDefinitions,
   categoryLabels,
@@ -10,6 +10,7 @@ import type { ComponentDefinition, ComponentCategory } from '@/types'
 /** Sidebar palette for browsing and dragging components onto the canvas */
 export function ComponentPalette() {
   const [search, setSearch] = useState('')
+  const [isCollapsed, setIsCollapsed] = useState(false)
 
   const filtered = useMemo(() => {
     if (!search.trim()) return componentDefinitions
@@ -33,9 +34,31 @@ export function ComponentPalette() {
     return map
   }, [filtered])
 
+  if (isCollapsed) {
+    return (
+      <aside
+        className="w-12 h-full flex flex-col items-center py-3 border-r shrink-0 transition-all"
+        style={{
+          backgroundColor: 'var(--color-sidebar-bg)',
+          borderColor: 'var(--color-border)',
+        }}
+      >
+        <button
+          onClick={() => setIsCollapsed(false)}
+          className="p-1.5 rounded-lg hover:bg-white/10 transition-colors"
+          style={{ color: 'var(--color-text-secondary)' }}
+          title="Expand palette"
+          aria-label="Expand palette"
+        >
+          <PanelLeftOpen size={16} />
+        </button>
+      </aside>
+    )
+  }
+
   return (
     <aside
-      className="w-64 h-full flex flex-col border-r overflow-hidden shrink-0"
+      className="w-64 h-full flex flex-col border-r overflow-hidden shrink-0 transition-all"
       style={{
         backgroundColor: 'var(--color-sidebar-bg)',
         borderColor: 'var(--color-border)',
@@ -43,9 +66,20 @@ export function ComponentPalette() {
     >
       {/* Header */}
       <div className="p-3 border-b" style={{ borderColor: 'var(--color-border)' }}>
-        <h2 className="text-sm font-semibold mb-2" style={{ color: 'var(--color-text-primary)' }}>
-          Components
-        </h2>
+        <div className="flex justify-between items-center mb-2">
+          <h2 className="text-sm font-semibold" style={{ color: 'var(--color-text-primary)' }}>
+            Components
+          </h2>
+          <button
+            onClick={() => setIsCollapsed(true)}
+            className="p-1 rounded-md hover:bg-white/10 transition-colors"
+            style={{ color: 'var(--color-text-secondary)' }}
+            title="Collapse palette"
+            aria-label="Collapse palette"
+          >
+            <PanelLeftClose size={14} />
+          </button>
+        </div>
         <div
           className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-sm"
           style={{

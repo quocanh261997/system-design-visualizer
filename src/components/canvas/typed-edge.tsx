@@ -3,6 +3,9 @@ import {
   EdgeLabelRenderer,
   type EdgeProps,
   useReactFlow,
+  getBezierPath,
+  Position,
+  BaseEdge,
 } from '@xyflow/react'
 import type { SystemEdge } from '@/types'
 import { CONNECTION_TYPE_STYLES } from '@/types'
@@ -45,6 +48,9 @@ function TypedEdgeComponent({
   sourceY,
   targetX,
   targetY,
+  sourcePosition = Position.Right,
+  targetPosition = Position.Left,
+  markerEnd,
   data,
 }: EdgeProps<SystemEdge>) {
   const updateEdgeLabel = useFlowStore((s) => s.updateEdgeLabel)
@@ -67,9 +73,30 @@ function TypedEdgeComponent({
   const isSimulating = status !== 'idle'
   const curveOffset = data?.curvatureOffset ?? 0
 
-  const [edgePath, labelX, labelY] = buildBendablePath(
-    sourceX, sourceY, targetX, targetY, curveOffset,
-  )
+  let edgePath = ''
+  let labelX = 0
+  let labelY = 0
+
+  if (curveOffset === 0) {
+    const [path, lx, ly] = getBezierPath({
+      sourceX,
+      sourceY,
+      sourcePosition,
+      targetX,
+      targetY,
+      targetPosition,
+    })
+    edgePath = path
+    labelX = lx
+    labelY = ly
+  } else {
+    const [path, lx, ly] = buildBendablePath(
+      sourceX, sourceY, targetX, targetY, curveOffset,
+    )
+    edgePath = path
+    labelX = lx
+    labelY = ly
+  }
 
   /* Stroke styling logic */
   let strokeColor = style.color
@@ -105,13 +132,17 @@ function TypedEdgeComponent({
 
     /* Signed distance from midpoint along perpendicular */
     const offset = (pos.x - mx) * nx + (pos.y - my) * ny
-    // The curve midpoint follows the drag pointer, so the control point needs twice the offset
     updateEdgeData(id, { curvatureOffset: Math.round(offset * 2) })
   }, [id, sourceX, sourceY, targetX, targetY, screenToFlowPosition, updateEdgeData])
 
   const onPointerUp = useCallback(() => {
     dragging.current = false
   }, [])
+
+  // If there's an existing marker from react flow base (e.g. string URL or default)
+  // React flow will pass markerEnd down as a string URL if we configure defaultEdgeOptions or edge options.
+  // We can also override it. By default, let's just use the `markerEnd` provided by the prop.
+  // We still need to configure the edge options to have the markerEnd in design-canvas.tsx, but here we just pass it along.
 
   return (
     <>
@@ -131,14 +162,17 @@ function TypedEdgeComponent({
       )}
 
       {/* Main edge path */}
-      <path
-        d={edgePath}
-        fill="none"
-        stroke={connectionType === 'streaming' && !isActive ? `url(#${gradientId})` : strokeColor}
-        strokeWidth={strokeWidth}
-        strokeDasharray={isActive ? '0' : style.strokeDasharray}
-        opacity={opacity}
-        style={{ transition: 'stroke 0.3s ease, stroke-width 0.3s ease, opacity 0.3s ease' }}
+      <BaseEdge
+        id={id}
+        path={edgePath}
+        markerEnd={markerEnd}
+        style={{
+          stroke: connectionType === 'streaming' && !isActive ? `url(#${gradientId})` : strokeColor,
+          strokeWidth,
+          opacity,
+          strokeDasharray: isActive ? '0' : style.strokeDasharray,
+          transition: 'stroke 0.3s ease, stroke-width 0.3s ease, opacity 0.3s ease'
+        }}
       />
       {/* Invisible wider hit area for easier clicking */}
       <path

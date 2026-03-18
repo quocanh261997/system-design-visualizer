@@ -121,13 +121,13 @@ export function TemplatePicker({ onClose }: TemplatePickerProps) {
         </div>
 
         {/* Footer */}
-        <div className="p-3 border-t text-center" style={{ borderColor: 'var(--color-border)' }}>
+        <div className="p-4 border-t shadow-[0_-4px_16px_rgba(0,0,0,0.2)]" style={{ borderColor: 'var(--color-border)', backgroundColor: 'var(--color-sidebar-bg)' }}>
           <button
             onClick={onClose}
-            className="text-xs font-medium px-4 py-1.5 rounded-lg transition-colors hover:bg-white/5"
-            style={{ color: 'var(--color-text-muted)' }}
+            className="w-full text-sm font-semibold px-4 py-3 rounded-xl transition-all shadow-lg hover:brightness-110 active:scale-[0.98]"
+            style={{ backgroundColor: 'var(--color-accent)', color: '#ffffff' }}
           >
-            Start with blank canvas
+            Start with Blank Canvas
           </button>
         </div>
       </div>
