@@ -61,7 +61,9 @@ export function DesignCanvas() {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       // Trigger pan mode when space is pressed, but don't interfere with typing in inputs
-      if (e.code === 'Space' && (e.target === document.body || (e.target as HTMLElement).tagName !== 'INPUT')) {
+      if (e.code === 'Space') {
+        const tag = (e.target as HTMLElement).tagName
+        if (tag === 'INPUT' || tag === 'TEXTAREA' || (e.target as HTMLElement).isContentEditable) return
         e.preventDefault()
         setIsSpacePressed(true)
       }
@@ -90,6 +92,7 @@ export function DesignCanvas() {
           x: e.clientX,
           y: e.clientY,
         })
+        snapshot()
         addTextNode(position, 'Text')
       }
     }
@@ -126,7 +129,7 @@ export function DesignCanvas() {
   )
 
   /** Handle single clicks on empty canvas */
-  const onPaneClick = useCallback((event: React.MouseEvent) => {
+  const onPaneClick = useCallback((_event: React.MouseEvent) => {
     // Normal single click: deselect
     setSelectedNode(null)
     setSelectedEdge(null)

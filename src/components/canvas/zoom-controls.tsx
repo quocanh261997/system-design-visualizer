@@ -20,6 +20,7 @@ export function ZoomControls() {
         onClick={() => zoomTo(Math.max(0.1, zoom - 0.1), { duration: 200 })}
         className="p-1.5 rounded-full hover:bg-white/10 transition-colors cursor-pointer"
         title="Zoom Out"
+        aria-label="Zoom out"
       >
         <Minus size={16} />
       </button>
@@ -36,6 +37,7 @@ export function ZoomControls() {
         onClick={() => zoomTo(Math.min(30, zoom + 0.1), { duration: 200 })}
         className="p-1.5 rounded-full hover:bg-white/10 transition-colors cursor-pointer"
         title="Zoom In"
+        aria-label="Zoom in"
       >
         <Plus size={16} />
       </button>

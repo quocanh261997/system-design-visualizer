@@ -185,7 +185,7 @@ export const useFlowStore = create<FlowState>((set, get) => ({
   addTextNode: (position, text) => {
     const node: SystemNode = {
       id: `text-${uuid()}`,
-      type: 'text' as any, // bypassing strict type momentarily or using the updated union
+      type: 'text',
       position,
       data: {
         componentType: 'text',
@@ -193,7 +193,7 @@ export const useFlowStore = create<FlowState>((set, get) => ({
         config: {},
       },
     }
-    set({ nodes: [...get().nodes, node as SystemNode] })
+    set({ nodes: [...get().nodes, node] })
   },
 
   setProjectName: (name) => set({ projectName: name }),

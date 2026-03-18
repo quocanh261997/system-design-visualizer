@@ -13,6 +13,10 @@ function TextNodeComponent({ id, data, selected }: NodeProps<SystemNode>) {
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
   useEffect(() => {
+    if (!isEditing) setEditValue(data.label)
+  }, [data.label, isEditing])
+
+  useEffect(() => {
     if (isEditing && textareaRef.current) {
       textareaRef.current.focus()
       // Put cursor at the end

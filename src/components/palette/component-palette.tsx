@@ -48,6 +48,7 @@ export function ComponentPalette() {
           className="p-1.5 rounded-lg hover:bg-white/10 transition-colors"
           style={{ color: 'var(--color-text-secondary)' }}
           title="Expand palette"
+          aria-label="Expand palette"
         >
           <PanelLeftOpen size={16} />
         </button>
@@ -74,6 +75,7 @@ export function ComponentPalette() {
             className="p-1 rounded-md hover:bg-white/10 transition-colors"
             style={{ color: 'var(--color-text-secondary)' }}
             title="Collapse palette"
+            aria-label="Collapse palette"
           >
             <PanelLeftClose size={14} />
           </button>

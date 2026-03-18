@@ -24,6 +24,10 @@ function GroupNodeComponent({ id, data, selected }: NodeProps<SystemNode>) {
   const inputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
+    if (!isEditing) setEditValue(data.label)
+  }, [data.label, isEditing])
+
+  useEffect(() => {
     if (isEditing && inputRef.current) {
       inputRef.current.focus()
       inputRef.current.select()
@@ -40,6 +44,7 @@ function GroupNodeComponent({ id, data, selected }: NodeProps<SystemNode>) {
   }
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
+    e.stopPropagation()
     if (e.key === 'Enter') handleSave()
     if (e.key === 'Escape') {
       setEditValue(data.label)
@@ -72,7 +77,7 @@ function GroupNodeComponent({ id, data, selected }: NodeProps<SystemNode>) {
           style={{ 
             color: 'var(--color-text-primary)'
           }}
-          onDoubleClick={() => setIsEditing(true)}
+          onDoubleClick={() => { if (!isEditing) setIsEditing(true) }}
         >
           {isEditing ? (
             <input
