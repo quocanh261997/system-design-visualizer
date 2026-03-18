@@ -9,12 +9,10 @@ function TextNodeComponent({ id, data, selected }: NodeProps<SystemNode>) {
   const updateNodeLabel = useFlowStore((s) => s.updateNodeLabel)
 
   const [isEditing, setIsEditing] = useState(false)
-  const [editValue, setEditValue] = useState(data.label)
+  const [editValueState, setEditValue] = useState(data.label)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
-  useEffect(() => {
-    if (!isEditing) setEditValue(data.label)
-  }, [data.label, isEditing])
+  const editValue = isEditing ? editValueState : data.label
 
   useEffect(() => {
     if (isEditing && textareaRef.current) {
