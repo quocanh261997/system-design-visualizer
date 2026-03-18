@@ -1,6 +1,6 @@
 {
   "name": "system-design-builder",
-  "private": false,
+  "private": true,
   "version": "0.1.0",
   "type": "module",
   "scripts": {

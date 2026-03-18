@@ -1,6 +1,8 @@
 # Contributing
 
-Thanks for your interest in contributing! Here's how to get started.
+Thanks for your interest in contributing! Please read our [Code of Conduct](CODE_OF_CONDUCT.md) before participating.
+
+Here's how to get started.
 
 ## Development Setup
 
