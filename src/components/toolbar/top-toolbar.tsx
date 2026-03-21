@@ -18,6 +18,7 @@ import { useFlowStore } from '@/store/use-flow-store'
 import { useUndoStore } from '@/store/use-undo-store'
 import { useWorkspaceStore } from '@/store/use-workspace-store'
 import { saveProject, exportProjectJson, importProjectJson } from '@/lib/persistence'
+import { WORKSPACE_TABS } from '@/types'
 import { exportAsPng, exportAsSvg, exportAsPdf } from '@/lib/export-canvas'
 
 interface TopToolbarProps {
@@ -120,7 +121,7 @@ export function TopToolbar({
         const text = await file.text()
         const data = importProjectJson(text)
         loadProject(data.nodes, data.edges, data.name)
-        if (data.activeTab) {
+        if (data.activeTab && WORKSPACE_TABS.some((t) => t.id === data.activeTab)) {
           useWorkspaceStore.getState().setActiveTab(data.activeTab as 'architecture')
         }
         onProjectIdChange(data.id)

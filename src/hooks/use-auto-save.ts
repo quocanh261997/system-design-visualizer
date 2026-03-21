@@ -15,19 +15,23 @@ export function useAutoSave(projectId: string | null) {
 
   useEffect(() => {
     const interval = setInterval(async () => {
-      const { nodes, edges, projectName } = useFlowStore.getState()
-      if (nodes.length === 0 && edges.length === 0) return
+      try {
+        const { nodes, edges, projectName } = useFlowStore.getState()
+        if (nodes.length === 0 && edges.length === 0) return
 
-      const { activeTab } = useWorkspaceStore.getState()
-      const id = await saveProject({
-        nodes,
-        edges,
-        name: projectName,
-        existingId: savedIdRef.current ?? undefined,
-        activeTab,
-      })
-      savedIdRef.current = id
-      localStorage.setItem('sdb-last-project-id', id)
+        const { activeTab } = useWorkspaceStore.getState()
+        const id = await saveProject({
+          nodes,
+          edges,
+          name: projectName,
+          existingId: savedIdRef.current ?? undefined,
+          activeTab,
+        })
+        savedIdRef.current = id
+        localStorage.setItem('sdb-last-project-id', id)
+      } catch {
+        // Silently ignore autosave failures to avoid disrupting the user
+      }
     }, AUTO_SAVE_INTERVAL)
 
     return () => clearInterval(interval)

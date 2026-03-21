@@ -33,16 +33,18 @@ function AppContent() {
     const lastId = localStorage.getItem(LAST_PROJECT_KEY)
     if (!lastId) return
     loadProject(lastId).then((data) => {
-      if (data && data.nodes.length > 0) {
+      if (data) {
         useFlowStore.getState().loadProject(data.nodes, data.edges, data.name)
-        if (data.activeTab) {
-          useWorkspaceStore.getState().setActiveTab(data.activeTab as 'architecture')
-        }
+        useWorkspaceStore.getState().setActiveTab(
+          (data.activeTab as 'architecture') ?? 'architecture'
+        )
         handleProjectIdChange(lastId)
       } else {
+        localStorage.removeItem(LAST_PROJECT_KEY)
         setShowTemplates(true)
       }
     }).catch(() => {
+      localStorage.removeItem(LAST_PROJECT_KEY)
       setShowTemplates(true)
     })
   }, [handleProjectIdChange])

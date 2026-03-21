@@ -7,6 +7,8 @@ export function WorkspaceTabs() {
 
   return (
     <div
+      role="tablist"
+      aria-label="Workspace tabs"
       className="flex items-center gap-0.5 px-4 border-b shrink-0"
       style={{ backgroundColor: 'var(--color-sidebar-bg)', borderColor: 'var(--color-border)' }}
     >
@@ -16,6 +18,8 @@ export function WorkspaceTabs() {
         return (
           <button
             key={tab.id}
+            role="tab"
+            aria-selected={isActive}
             onClick={() => setActiveTab(tab.id)}
             className="relative flex items-center gap-1.5 px-3 py-2 text-xs font-medium transition-colors"
             style={{

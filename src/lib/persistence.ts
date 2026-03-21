@@ -128,9 +128,16 @@ export function exportProjectJson(
 
 /** Import project from JSON string with backward-compatible defaults */
 export function importProjectJson(json: string): ProjectData {
-  const data = JSON.parse(json) as ProjectData
-  if (!data.nodes || !data.edges || !data.name) {
+  const data: unknown = JSON.parse(json)
+  if (
+    !data ||
+    typeof data !== 'object' ||
+    !Array.isArray((data as ProjectData).nodes) ||
+    !Array.isArray((data as ProjectData).edges) ||
+    typeof (data as ProjectData).name !== 'string' ||
+    !(data as ProjectData).name.trim()
+  ) {
     throw new Error('Invalid project file format')
   }
-  return withDefaults(data)
+  return withDefaults(data as ProjectData)
 }
