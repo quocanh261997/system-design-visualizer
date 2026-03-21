@@ -1,19 +1,16 @@
 import { useEffect, useCallback } from 'react'
 import { useFlowStore } from '@/store/use-flow-store'
 import { useUndoStore } from '@/store/use-undo-store'
-import { saveProject } from '@/lib/persistence'
+import { useWorkspaceStore } from '@/store/use-workspace-store'
+import { WORKSPACE_TABS } from '@/types'
 
 interface ShortcutOptions {
-  projectId: string | null
-  onSave: (id: string) => void
   onToggleAnalysis: () => void
   onOpenTemplates: () => void
 }
 
 /** Centralized keyboard shortcut handler */
 export function useKeyboardShortcuts({
-  projectId,
-  onSave,
   onToggleAnalysis,
   onOpenTemplates,
 }: ShortcutOptions) {
@@ -23,12 +20,20 @@ export function useKeyboardShortcuts({
       const active = document.activeElement
       const isInput = active?.tagName === 'INPUT' || active?.tagName === 'TEXTAREA' || active?.tagName === 'SELECT'
 
-      // Ctrl/Cmd+S: Save
+      // Ctrl/Cmd+1-6: Switch workspace tabs
+      if (meta && !e.shiftKey && e.key >= '1' && e.key <= '6' && !isInput) {
+        const tabDef = WORKSPACE_TABS.find((t) => t.shortcutKey === e.key)
+        if (tabDef) {
+          e.preventDefault()
+          useWorkspaceStore.getState().setActiveTab(tabDef.id)
+          return
+        }
+      }
+
+      // Ctrl/Cmd+S: Save (delegate to toolbar via custom event)
       if (meta && e.key === 's') {
         e.preventDefault()
-        const { nodes, edges, projectName } = useFlowStore.getState()
-        const id = await saveProject(nodes, edges, projectName, projectId ?? undefined)
-        onSave(id)
+        window.dispatchEvent(new CustomEvent('sdb:save'))
         return
       }
 
@@ -87,7 +92,7 @@ export function useKeyboardShortcuts({
         return
       }
     },
-    [projectId, onSave, onToggleAnalysis, onOpenTemplates]
+    [onToggleAnalysis, onOpenTemplates]
   )
 
   useEffect(() => {
@@ -106,4 +111,5 @@ export const SHORTCUT_MAP = [
   { keys: ['G'], action: 'Add group boundary' },
   { keys: ['Ctrl', 'T'], action: 'Open templates' },
   { keys: ['Ctrl', 'Shift', 'A'], action: 'Toggle analysis' },
+  { keys: ['Ctrl', '1-6'], action: 'Switch workspace tab' },
 ]

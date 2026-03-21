@@ -77,6 +77,53 @@ export interface SimulationScenario {
 /** Simulation playback state */
 export type SimulationStatus = 'idle' | 'playing' | 'paused' | 'finished'
 
+/** Placeholder for notes (refined in Phase 2) */
+export interface ProjectNotes {
+  functionalRequirements: string[]
+  nonFunctionalRequirements: string[]
+  assumptions: string[]
+  tradeoffs: string[]
+  freeformNotes: string
+}
+
+/** Placeholder for estimation rows (refined in Phase 3) */
+export interface EstimationRow {
+  id: string
+  label: string
+  formula: string
+  value: number
+  unit: string
+}
+
+/** Placeholder for database schema (refined in Phase 4) */
+export interface DatabaseSchema {
+  tables: unknown[]
+  relationships: unknown[]
+}
+
+/** Placeholder for API contracts (future phase) */
+export interface ApiContract {
+  endpoints: unknown[]
+}
+
+/** Placeholder for sequence diagrams (future phase) */
+export interface SequenceDiagram {
+  steps: unknown[]
+}
+
+/** Default empty values for new artifact fields */
+export const DEFAULT_PROJECT_NOTES: ProjectNotes = {
+  functionalRequirements: [],
+  nonFunctionalRequirements: [],
+  assumptions: [],
+  tradeoffs: [],
+  freeformNotes: '',
+}
+
+export const DEFAULT_DATABASE_SCHEMA: DatabaseSchema = { tables: [], relationships: [] }
+export const DEFAULT_API_CONTRACT: ApiContract = { endpoints: [] }
+export const DEFAULT_SEQUENCE_DIAGRAM: SequenceDiagram = { steps: [] }
+
 /** Serializable project format for save/load */
 export interface ProjectData {
   id: string
@@ -84,6 +131,12 @@ export interface ProjectData {
   description: string
   nodes: SystemNode[]
   edges: SystemEdge[]
+  notes?: ProjectNotes
+  estimations?: EstimationRow[]
+  schemas?: DatabaseSchema
+  apiContracts?: ApiContract
+  sequences?: SequenceDiagram
+  activeTab?: string
   createdAt: string
   updatedAt: string
 }

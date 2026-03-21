@@ -11,6 +11,11 @@ export type {
   SystemNode,
   SystemEdge,
   ProjectData,
+  ProjectNotes,
+  EstimationRow,
+  DatabaseSchema,
+  ApiContract,
+  SequenceDiagram,
   ConnectionType,
   SimulationStep,
   SimulationScenario,
@@ -20,4 +25,17 @@ export type {
 export {
   PROTOCOL_OPTIONS,
   CONNECTION_TYPE_STYLES,
+  DEFAULT_PROJECT_NOTES,
+  DEFAULT_DATABASE_SCHEMA,
+  DEFAULT_API_CONTRACT,
+  DEFAULT_SEQUENCE_DIAGRAM,
 } from './graph'
+
+export type {
+  WorkspaceTabId,
+  WorkspaceTabDef,
+} from './workspace'
+
+export {
+  WORKSPACE_TABS,
+} from './workspace'

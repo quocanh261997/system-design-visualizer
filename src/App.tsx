@@ -1,66 +1,82 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { ReactFlowProvider } from '@xyflow/react'
-import { DesignCanvas } from '@/components/canvas/design-canvas'
-import { ComponentPalette } from '@/components/palette/component-palette'
-import { PropertyPanel } from '@/components/properties/property-panel'
-import { EdgePropertyPanel } from '@/components/properties/edge-property-panel'
-import { AnalysisPanel } from '@/components/analysis/analysis-panel'
 import { TopToolbar } from '@/components/toolbar/top-toolbar'
-import { SimulationControls } from '@/components/toolbar/simulation-controls'
+import { WorkspaceTabs } from '@/components/workspace/workspace-tabs'
+import { WorkspaceContent } from '@/components/workspace/workspace-content'
 import { TemplatePicker } from '@/components/templates/template-picker'
 import { ShortcutsHelp } from '@/components/toolbar/shortcuts-help'
 import { useAutoSave } from '@/hooks/use-auto-save'
 import { useKeyboardShortcuts } from '@/hooks/use-keyboard-shortcuts'
 import { useFlowStore } from '@/store/use-flow-store'
+import { useWorkspaceStore } from '@/store/use-workspace-store'
+import { loadProject } from '@/lib/persistence'
+
+const LAST_PROJECT_KEY = 'sdb-last-project-id'
+const TEMPLATES_SHOWN_KEY = 'sdb-templates-shown'
 
 function AppContent() {
+  const hasLastProject = localStorage.getItem(LAST_PROJECT_KEY) !== null
+  const hasSeenTemplates = localStorage.getItem(TEMPLATES_SHOWN_KEY) !== null
   const [projectId, setProjectId] = useState<string | null>(null)
   const [showAnalysis, setShowAnalysis] = useState(false)
-  const [showTemplates, setShowTemplates] = useState(true)
+  const [showTemplates, setShowTemplates] = useState(!hasLastProject && !hasSeenTemplates)
   const [showShortcuts, setShowShortcuts] = useState(false)
   useAutoSave(projectId)
 
-  const selectedNodeId = useFlowStore((s) => s.selectedNodeId)
-  const selectedEdgeId = useFlowStore((s) => s.selectedEdgeId)
+  const handleProjectIdChange = useCallback((id: string) => {
+    setProjectId(id)
+    localStorage.setItem(LAST_PROJECT_KEY, id)
+  }, [])
+
+  // Load last project from IndexedDB on startup
+  useEffect(() => {
+    const lastId = localStorage.getItem(LAST_PROJECT_KEY)
+    if (!lastId) return
+    loadProject(lastId).then((data) => {
+      if (data) {
+        useFlowStore.getState().loadProject(data.nodes, data.edges, data.name)
+        useWorkspaceStore.getState().setActiveTab(
+          (data.activeTab as 'architecture') ?? 'architecture'
+        )
+        handleProjectIdChange(lastId)
+      } else {
+        localStorage.removeItem(LAST_PROJECT_KEY)
+        setShowTemplates(true)
+      }
+    }).catch(() => {
+      localStorage.removeItem(LAST_PROJECT_KEY)
+      setShowTemplates(true)
+    })
+  }, [handleProjectIdChange])
 
   const toggleAnalysis = useCallback(() => setShowAnalysis((v) => !v), [])
   const openTemplates = useCallback(() => setShowTemplates(true), [])
 
   useKeyboardShortcuts({
-    projectId,
-    onSave: setProjectId,
     onToggleAnalysis: toggleAnalysis,
     onOpenTemplates: openTemplates,
   })
-
-  const rightPanel = showAnalysis
-    ? <AnalysisPanel onClose={() => setShowAnalysis(false)} />
-    : selectedEdgeId
-      ? <EdgePropertyPanel />
-      : selectedNodeId
-        ? <PropertyPanel />
-        : null
 
   return (
     <div className="flex flex-col h-screen w-screen overflow-hidden">
       <TopToolbar
         projectId={projectId}
-        onProjectIdChange={setProjectId}
+        onProjectIdChange={handleProjectIdChange}
         onToggleAnalysis={toggleAnalysis}
         onOpenTemplates={openTemplates}
         onOpenShortcuts={() => setShowShortcuts(true)}
         analysisOpen={showAnalysis}
       />
-      <div className="flex flex-1 overflow-hidden">
-        <ComponentPalette />
-        <div className="relative flex-1 h-full">
-          <SimulationControls />
-          <DesignCanvas />
-        </div>
-        {rightPanel}
-      </div>
+      <WorkspaceTabs />
+      <WorkspaceContent
+        showAnalysis={showAnalysis}
+        onCloseAnalysis={() => setShowAnalysis(false)}
+      />
 
-      {showTemplates && <TemplatePicker onClose={() => setShowTemplates(false)} />}
+      {showTemplates && <TemplatePicker onClose={() => {
+        setShowTemplates(false)
+        localStorage.setItem(TEMPLATES_SHOWN_KEY, '1')
+      }} />}
       {showShortcuts && <ShortcutsHelp onClose={() => setShowShortcuts(false)} />}
     </div>
   )
