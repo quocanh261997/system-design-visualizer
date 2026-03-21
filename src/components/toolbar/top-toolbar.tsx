@@ -17,6 +17,7 @@ import {
 import { useFlowStore } from '@/store/use-flow-store'
 import { useUndoStore } from '@/store/use-undo-store'
 import { useWorkspaceStore } from '@/store/use-workspace-store'
+import { useNotesStore } from '@/store/use-notes-store'
 import { saveProject, exportProjectJson, importProjectJson } from '@/lib/persistence'
 import { WORKSPACE_TABS } from '@/types'
 import { exportAsPng, exportAsSvg, exportAsPdf } from '@/lib/export-canvas'
@@ -59,6 +60,7 @@ export function TopToolbar({
         name: projectName,
         existingId: projectId ?? undefined,
         activeTab,
+        notes: useNotesStore.getState().notes,
       })
       onProjectIdChange(id)
       setSaveStatus('Saved!')
@@ -77,7 +79,7 @@ export function TopToolbar({
 
   const handleExportJson = useCallback(() => {
     const { activeTab } = useWorkspaceStore.getState()
-    const json = exportProjectJson(nodes, edges, projectName, activeTab)
+    const json = exportProjectJson(nodes, edges, projectName, activeTab, useNotesStore.getState().notes)
     const blob = new Blob([json], { type: 'application/json' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
@@ -121,6 +123,7 @@ export function TopToolbar({
         const text = await file.text()
         const data = importProjectJson(text)
         loadProject(data.nodes, data.edges, data.name)
+        if (data.notes) useNotesStore.getState().loadNotes(data.notes)
         if (data.activeTab && WORKSPACE_TABS.some((t) => t.id === data.activeTab)) {
           useWorkspaceStore.getState().setActiveTab(data.activeTab as 'architecture')
         }
@@ -247,7 +250,7 @@ export function TopToolbar({
         </button>
 
         <div className="w-px h-5 mx-1" style={{ backgroundColor: 'var(--color-border)' }} />
-        <button onClick={clear} className={btnClass} title="Clear canvas">
+        <button onClick={() => { clear(); useNotesStore.getState().clear() }} className={btnClass} title="Clear canvas">
           <Trash2 size={14} /> Clear
         </button>
         <button onClick={onOpenShortcuts} className={btnClass} title="Keyboard shortcuts">

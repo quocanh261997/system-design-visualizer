@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react'
 import { X, Search, Layout, Zap, Trophy, BookOpen } from 'lucide-react'
 import { designTemplates, type DesignTemplate } from '@/data/templates'
 import { useFlowStore } from '@/store/use-flow-store'
+import { useNotesStore } from '@/store/use-notes-store'
 
 const DIFFICULTY_CONFIG = {
   beginner: { color: '#22c55e', label: 'Beginner', icon: BookOpen },
@@ -38,6 +39,7 @@ export function TemplatePicker({ onClose }: TemplatePickerProps) {
 
   const handleSelect = (template: DesignTemplate) => {
     loadProject(template.nodes, template.edges, template.name)
+    useNotesStore.getState().clear()
     onClose()
   }
 

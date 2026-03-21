@@ -9,6 +9,7 @@ import { useAutoSave } from '@/hooks/use-auto-save'
 import { useKeyboardShortcuts } from '@/hooks/use-keyboard-shortcuts'
 import { useFlowStore } from '@/store/use-flow-store'
 import { useWorkspaceStore } from '@/store/use-workspace-store'
+import { useNotesStore } from '@/store/use-notes-store'
 import { loadProject } from '@/lib/persistence'
 
 const LAST_PROJECT_KEY = 'sdb-last-project-id'
@@ -35,6 +36,7 @@ function AppContent() {
     loadProject(lastId).then((data) => {
       if (data) {
         useFlowStore.getState().loadProject(data.nodes, data.edges, data.name)
+        if (data.notes) useNotesStore.getState().loadNotes(data.notes)
         useWorkspaceStore.getState().setActiveTab(
           (data.activeTab as 'architecture') ?? 'architecture'
         )
