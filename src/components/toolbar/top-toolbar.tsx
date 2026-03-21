@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import {
   Save,
   Download,
@@ -16,6 +16,7 @@ import {
 } from 'lucide-react'
 import { useFlowStore } from '@/store/use-flow-store'
 import { useUndoStore } from '@/store/use-undo-store'
+import { useWorkspaceStore } from '@/store/use-workspace-store'
 import { saveProject, exportProjectJson, importProjectJson } from '@/lib/persistence'
 import { exportAsPng, exportAsSvg, exportAsPdf } from '@/lib/export-canvas'
 
@@ -50,7 +51,14 @@ export function TopToolbar({
 
   const handleSave = useCallback(async () => {
     try {
-      const id = await saveProject(nodes, edges, projectName, projectId ?? undefined)
+      const { activeTab } = useWorkspaceStore.getState()
+      const id = await saveProject({
+        nodes,
+        edges,
+        name: projectName,
+        existingId: projectId ?? undefined,
+        activeTab,
+      })
       onProjectIdChange(id)
       setSaveStatus('Saved!')
       setTimeout(() => setSaveStatus(''), 2000)
@@ -59,8 +67,16 @@ export function TopToolbar({
     }
   }, [nodes, edges, projectName, projectId, onProjectIdChange])
 
+  // Listen for keyboard shortcut save trigger
+  useEffect(() => {
+    const handler = () => { handleSave() }
+    window.addEventListener('sdb:save', handler)
+    return () => window.removeEventListener('sdb:save', handler)
+  }, [handleSave])
+
   const handleExportJson = useCallback(() => {
-    const json = exportProjectJson(nodes, edges, projectName)
+    const { activeTab } = useWorkspaceStore.getState()
+    const json = exportProjectJson(nodes, edges, projectName, activeTab)
     const blob = new Blob([json], { type: 'application/json' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
@@ -104,6 +120,9 @@ export function TopToolbar({
         const text = await file.text()
         const data = importProjectJson(text)
         loadProject(data.nodes, data.edges, data.name)
+        if (data.activeTab) {
+          useWorkspaceStore.getState().setActiveTab(data.activeTab as 'architecture')
+        }
         onProjectIdChange(data.id)
       } catch {
         alert('Invalid project file')
