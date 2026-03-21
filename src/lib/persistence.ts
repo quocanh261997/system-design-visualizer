@@ -1,8 +1,9 @@
 import Dexie, { type EntityTable } from 'dexie'
 import { v4 as uuid } from 'uuid'
-import type { ProjectData, SystemNode, SystemEdge } from '@/types'
+import type { ProjectData, SystemNode, SystemEdge, ProjectNotes } from '@/types'
 import {
   DEFAULT_PROJECT_NOTES,
+  DEFAULT_NON_FUNCTIONAL_TARGETS,
   DEFAULT_DATABASE_SCHEMA,
   DEFAULT_API_CONTRACT,
   DEFAULT_SEQUENCE_DIAGRAM,
@@ -31,6 +32,34 @@ class SDBDatabase extends Dexie {
         project.activeTab ??= 'architecture'
       })
     })
+
+    this.version(3).stores({
+      projects: 'id, name, updatedAt',
+    }).upgrade((tx) => {
+      return tx.table('projects').toCollection().modify((project) => {
+        if (project.notes && !project.notes.nonFunctionalTargets) {
+          project.notes = {
+            functionalRequirements: (project.notes.functionalRequirements ?? []).map(
+              (text: string) => typeof text === 'string'
+                ? { id: uuid(), text, completed: false }
+                : text
+            ),
+            nonFunctionalTargets: { ...DEFAULT_NON_FUNCTIONAL_TARGETS },
+            assumptions: (project.notes.assumptions ?? []).map(
+              (text: string) => typeof text === 'string'
+                ? { id: uuid(), text, completed: false }
+                : text
+            ),
+            tradeoffs: (project.notes.tradeoffs ?? []).map(
+              (text: string) => typeof text === 'string'
+                ? { id: uuid(), title: text, options: '', chosen: '', rationale: '' }
+                : text
+            ),
+            freeformNotes: project.notes.freeformNotes ?? '',
+          }
+        }
+      })
+    })
   }
 }
 
@@ -38,9 +67,17 @@ export const db = new SDBDatabase()
 
 /** Apply defaults to a loaded project for backward compatibility */
 function withDefaults(project: ProjectData): ProjectData {
+  const notes = project.notes ?? { ...DEFAULT_PROJECT_NOTES }
   return {
     ...project,
-    notes: project.notes ?? { ...DEFAULT_PROJECT_NOTES },
+    notes: {
+      ...DEFAULT_PROJECT_NOTES,
+      ...notes,
+      nonFunctionalTargets: {
+        ...DEFAULT_NON_FUNCTIONAL_TARGETS,
+        ...(notes as ProjectNotes).nonFunctionalTargets,
+      },
+    },
     estimations: project.estimations ?? [],
     schemas: project.schemas ?? { ...DEFAULT_DATABASE_SCHEMA },
     apiContracts: project.apiContracts ?? { ...DEFAULT_API_CONTRACT },
@@ -55,11 +92,12 @@ export interface SaveProjectOptions {
   name: string
   existingId?: string
   activeTab?: string
+  notes?: ProjectNotes
 }
 
 /** Save current project to IndexedDB */
 export async function saveProject(opts: SaveProjectOptions): Promise<string> {
-  const { nodes, edges, name, existingId, activeTab } = opts
+  const { nodes, edges, name, existingId, activeTab, notes } = opts
   const now = new Date().toISOString()
   const id = existingId ?? uuid()
 
@@ -71,7 +109,7 @@ export async function saveProject(opts: SaveProjectOptions): Promise<string> {
     description: '',
     nodes,
     edges,
-    notes: existing?.notes ?? { ...DEFAULT_PROJECT_NOTES },
+    notes: notes ?? existing?.notes ?? { ...DEFAULT_PROJECT_NOTES },
     estimations: existing?.estimations ?? [],
     schemas: existing?.schemas ?? { ...DEFAULT_DATABASE_SCHEMA },
     apiContracts: existing?.apiContracts ?? { ...DEFAULT_API_CONTRACT },
@@ -106,7 +144,8 @@ export function exportProjectJson(
   nodes: SystemNode[],
   edges: SystemEdge[],
   name: string,
-  activeTab?: string
+  activeTab?: string,
+  notes?: ProjectNotes
 ): string {
   const project: ProjectData = {
     id: uuid(),
@@ -114,7 +153,7 @@ export function exportProjectJson(
     description: '',
     nodes,
     edges,
-    notes: { ...DEFAULT_PROJECT_NOTES },
+    notes: notes ?? { ...DEFAULT_PROJECT_NOTES },
     estimations: [],
     schemas: { ...DEFAULT_DATABASE_SCHEMA },
     apiContracts: { ...DEFAULT_API_CONTRACT },

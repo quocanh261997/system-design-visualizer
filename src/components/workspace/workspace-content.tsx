@@ -3,7 +3,7 @@ import { ArchitectureTab } from '@/components/tabs/architecture-tab'
 import { SchemaTabPlaceholder } from '@/components/tabs/schema-tab-placeholder'
 import { ApiTabPlaceholder } from '@/components/tabs/api-tab-placeholder'
 import { SequenceTabPlaceholder } from '@/components/tabs/sequence-tab-placeholder'
-import { NotesTabPlaceholder } from '@/components/tabs/notes-tab-placeholder'
+import { NotesTab } from '@/components/tabs/notes-tab'
 import { EstimationTabPlaceholder } from '@/components/tabs/estimation-tab-placeholder'
 
 interface WorkspaceContentProps {
@@ -24,7 +24,7 @@ export function WorkspaceContent({ showAnalysis, onCloseAnalysis }: WorkspaceCon
     case 'sequence':
       return <SequenceTabPlaceholder />
     case 'notes':
-      return <NotesTabPlaceholder />
+      return <NotesTab />
     case 'estimation':
       return <EstimationTabPlaceholder />
     default:

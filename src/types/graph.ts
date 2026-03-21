@@ -77,12 +77,34 @@ export interface SimulationScenario {
 /** Simulation playback state */
 export type SimulationStatus = 'idle' | 'playing' | 'paused' | 'finished'
 
-/** Placeholder for notes (refined in Phase 2) */
+export interface FunctionalRequirement {
+  id: string
+  text: string
+  completed: boolean
+}
+
+export interface NonFunctionalTargets {
+  latencyMs: number | null
+  throughputQps: number | null
+  availabilityPercent: number | null
+  consistencyModel: 'strong' | 'eventual' | 'causal' | null
+  storageEstimate: string
+  readWriteRatio: string
+}
+
+export interface TradeoffEntry {
+  id: string
+  title: string
+  options: string
+  chosen: string
+  rationale: string
+}
+
 export interface ProjectNotes {
-  functionalRequirements: string[]
-  nonFunctionalRequirements: string[]
-  assumptions: string[]
-  tradeoffs: string[]
+  functionalRequirements: FunctionalRequirement[]
+  nonFunctionalTargets: NonFunctionalTargets
+  assumptions: FunctionalRequirement[]
+  tradeoffs: TradeoffEntry[]
   freeformNotes: string
 }
 
@@ -111,10 +133,18 @@ export interface SequenceDiagram {
   steps: unknown[]
 }
 
-/** Default empty values for new artifact fields */
+export const DEFAULT_NON_FUNCTIONAL_TARGETS: NonFunctionalTargets = {
+  latencyMs: null,
+  throughputQps: null,
+  availabilityPercent: null,
+  consistencyModel: null,
+  storageEstimate: '',
+  readWriteRatio: '',
+}
+
 export const DEFAULT_PROJECT_NOTES: ProjectNotes = {
   functionalRequirements: [],
-  nonFunctionalRequirements: [],
+  nonFunctionalTargets: { ...DEFAULT_NON_FUNCTIONAL_TARGETS },
   assumptions: [],
   tradeoffs: [],
   freeformNotes: '',
