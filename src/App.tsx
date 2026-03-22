@@ -11,6 +11,7 @@ import { useFlowStore } from '@/store/use-flow-store'
 import { useWorkspaceStore } from '@/store/use-workspace-store'
 import { useNotesStore } from '@/store/use-notes-store'
 import { useEstimationStore } from '@/store/use-estimation-store'
+import { useSchemaStore } from '@/store/use-schema-store'
 import { loadProject } from '@/lib/persistence'
 
 const LAST_PROJECT_KEY = 'sdb-last-project-id'
@@ -39,6 +40,9 @@ function AppContent() {
         useFlowStore.getState().loadProject(data.nodes, data.edges, data.name)
         if (data.notes) useNotesStore.getState().loadNotes(data.notes)
         if (data.estimations) useEstimationStore.getState().loadEstimation(data.estimations)
+        if (data.schemas && 'tablePositions' in data.schemas) {
+          useSchemaStore.getState().loadSchema(data.schemas as import('@/types/schema').DatabaseSchemaData)
+        }
         useWorkspaceStore.getState().setActiveTab(
           (data.activeTab as 'architecture') ?? 'architecture'
         )

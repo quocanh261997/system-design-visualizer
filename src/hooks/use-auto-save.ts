@@ -3,6 +3,7 @@ import { useFlowStore } from '@/store/use-flow-store'
 import { useWorkspaceStore } from '@/store/use-workspace-store'
 import { useNotesStore } from '@/store/use-notes-store'
 import { useEstimationStore } from '@/store/use-estimation-store'
+import { useSchemaStore } from '@/store/use-schema-store'
 import { saveProject } from '@/lib/persistence'
 
 const AUTO_SAVE_INTERVAL = 30_000 // 30 seconds
@@ -22,6 +23,7 @@ export function useAutoSave(projectId: string | null) {
         const { activeTab } = useWorkspaceStore.getState()
         const { notes } = useNotesStore.getState()
         const { data: estimations } = useEstimationStore.getState()
+        const schemas = useSchemaStore.getState().getSchemaData()
 
         const hasCanvas = nodes.length > 0 || edges.length > 0
         const hasEstimation = estimations.sections.some(
@@ -31,7 +33,8 @@ export function useAutoSave(projectId: string | null) {
           notes.functionalRequirements.length > 0 ||
           notes.assumptions.length > 0 ||
           notes.tradeoffs.length > 0
-        if (!hasCanvas && !hasEstimation && !hasNotes) return
+        const hasSchema = schemas.tables.length > 0
+        if (!hasCanvas && !hasEstimation && !hasNotes && !hasSchema) return
         const id = await saveProject({
           nodes,
           edges,
@@ -40,6 +43,7 @@ export function useAutoSave(projectId: string | null) {
           activeTab,
           notes,
           estimations,
+          schemas,
         })
         savedIdRef.current = id
         localStorage.setItem('sdb-last-project-id', id)

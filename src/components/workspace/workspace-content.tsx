@@ -1,6 +1,6 @@
 import { useWorkspaceStore } from '@/store/use-workspace-store'
 import { ArchitectureTab } from '@/components/tabs/architecture-tab'
-import { SchemaTabPlaceholder } from '@/components/tabs/schema-tab-placeholder'
+import { SchemaTab } from '@/components/tabs/schema-tab'
 import { ApiTabPlaceholder } from '@/components/tabs/api-tab-placeholder'
 import { SequenceTabPlaceholder } from '@/components/tabs/sequence-tab-placeholder'
 import { NotesTab } from '@/components/tabs/notes-tab'
@@ -18,7 +18,7 @@ export function WorkspaceContent({ showAnalysis, onCloseAnalysis }: WorkspaceCon
     case 'architecture':
       return <ArchitectureTab showAnalysis={showAnalysis} onCloseAnalysis={onCloseAnalysis} />
     case 'schema':
-      return <SchemaTabPlaceholder />
+      return <SchemaTab />
     case 'api':
       return <ApiTabPlaceholder />
     case 'sequence':

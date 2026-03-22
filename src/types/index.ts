@@ -48,3 +48,19 @@ export type {
 export {
   WORKSPACE_TABS,
 } from './workspace'
+
+export type {
+  SchemaColumn,
+  SchemaIndex,
+  SchemaTable,
+  SchemaRelationship,
+  RelationshipCardinality,
+  SchemaDialect,
+  DatabaseSchemaData,
+} from './schema'
+
+export {
+  DEFAULT_SCHEMA_DATA,
+  DATA_TYPES,
+  INDEX_TYPES,
+} from './schema'

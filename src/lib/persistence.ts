@@ -1,6 +1,6 @@
 import Dexie, { type EntityTable } from 'dexie'
 import { v4 as uuid } from 'uuid'
-import type { ProjectData, SystemNode, SystemEdge, ProjectNotes, EstimationData } from '@/types'
+import type { ProjectData, SystemNode, SystemEdge, ProjectNotes, EstimationData, DatabaseSchema } from '@/types'
 import {
   DEFAULT_PROJECT_NOTES,
   DEFAULT_NON_FUNCTIONAL_TARGETS,
@@ -113,11 +113,12 @@ export interface SaveProjectOptions {
   activeTab?: string
   notes?: ProjectNotes
   estimations?: EstimationData
+  schemas?: DatabaseSchema
 }
 
 /** Save current project to IndexedDB */
 export async function saveProject(opts: SaveProjectOptions): Promise<string> {
-  const { nodes, edges, name, existingId, activeTab, notes, estimations } = opts
+  const { nodes, edges, name, existingId, activeTab, notes, estimations, schemas } = opts
   const now = new Date().toISOString()
   const id = existingId ?? uuid()
 
@@ -131,7 +132,7 @@ export async function saveProject(opts: SaveProjectOptions): Promise<string> {
     edges,
     notes: notes ?? existing?.notes ?? { ...DEFAULT_PROJECT_NOTES },
     estimations: estimations ?? existing?.estimations ?? { ...DEFAULT_ESTIMATION_DATA },
-    schemas: existing?.schemas ?? { ...DEFAULT_DATABASE_SCHEMA },
+    schemas: schemas ?? existing?.schemas ?? { ...DEFAULT_DATABASE_SCHEMA },
     apiContracts: existing?.apiContracts ?? { ...DEFAULT_API_CONTRACT },
     sequences: existing?.sequences ?? { ...DEFAULT_SEQUENCE_DIAGRAM },
     activeTab: activeTab ?? existing?.activeTab ?? 'architecture',
@@ -166,7 +167,8 @@ export function exportProjectJson(
   name: string,
   activeTab?: string,
   notes?: ProjectNotes,
-  estimations?: EstimationData
+  estimations?: EstimationData,
+  schemas?: DatabaseSchema
 ): string {
   const project: ProjectData = {
     id: uuid(),
@@ -176,7 +178,7 @@ export function exportProjectJson(
     edges,
     notes: notes ?? { ...DEFAULT_PROJECT_NOTES },
     estimations: estimations ?? { ...DEFAULT_ESTIMATION_DATA },
-    schemas: { ...DEFAULT_DATABASE_SCHEMA },
+    schemas: schemas ?? { ...DEFAULT_DATABASE_SCHEMA },
     apiContracts: { ...DEFAULT_API_CONTRACT },
     sequences: { ...DEFAULT_SEQUENCE_DIAGRAM },
     activeTab: activeTab ?? 'architecture',

@@ -1,5 +1,6 @@
 import type { Node, Edge } from '@xyflow/react'
 import type { ComponentConfig } from './component-registry'
+import type { DatabaseSchemaData } from './schema'
 
 /** Data attached to each system design node */
 export interface SystemNodeData {
@@ -148,11 +149,8 @@ export const DEFAULT_ESTIMATION_DATA: EstimationData = {
   customNotes: '',
 }
 
-/** Placeholder for database schema (refined in Phase 4) */
-export interface DatabaseSchema {
-  tables: unknown[]
-  relationships: unknown[]
-}
+/** Re-export schema types for backward compat */
+export type { DatabaseSchemaData as DatabaseSchema } from './schema'
 
 /** Placeholder for API contracts (future phase) */
 export interface ApiContract {
@@ -181,7 +179,7 @@ export const DEFAULT_PROJECT_NOTES: ProjectNotes = {
   freeformNotes: '',
 }
 
-export const DEFAULT_DATABASE_SCHEMA: DatabaseSchema = { tables: [], relationships: [] }
+export { DEFAULT_SCHEMA_DATA as DEFAULT_DATABASE_SCHEMA } from './schema'
 export const DEFAULT_API_CONTRACT: ApiContract = { endpoints: [] }
 export const DEFAULT_SEQUENCE_DIAGRAM: SequenceDiagram = { steps: [] }
 
@@ -194,7 +192,7 @@ export interface ProjectData {
   edges: SystemEdge[]
   notes?: ProjectNotes
   estimations?: EstimationData
-  schemas?: DatabaseSchema
+  schemas?: DatabaseSchemaData
   apiContracts?: ApiContract
   sequences?: SequenceDiagram
   activeTab?: string
