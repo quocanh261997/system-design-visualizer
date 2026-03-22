@@ -5,6 +5,9 @@ import { WorkspaceTabs } from '@/components/workspace/workspace-tabs'
 import { WorkspaceContent } from '@/components/workspace/workspace-content'
 import { TemplatePicker } from '@/components/templates/template-picker'
 import { ShortcutsHelp } from '@/components/toolbar/shortcuts-help'
+import { TimerProgressBar } from '@/components/timer/timer-progress-bar'
+import { TimerProvider } from '@/components/timer/timer-context'
+import { useTimerContext } from '@/components/timer/use-timer-context'
 import { useAutoSave } from '@/hooks/use-auto-save'
 import { useKeyboardShortcuts } from '@/hooks/use-keyboard-shortcuts'
 import { useFlowStore } from '@/store/use-flow-store'
@@ -59,15 +62,19 @@ function AppContent() {
 
   const toggleAnalysis = useCallback(() => setShowAnalysis((v) => !v), [])
   const openTemplates = useCallback(() => setShowTemplates(true), [])
+  const timer = useTimerContext()
 
   useKeyboardShortcuts({
     onToggleAnalysis: toggleAnalysis,
     onOpenTemplates: openTemplates,
+    onToggleTimer: timer.toggle,
   })
 
   return (
     <div className="flex flex-col h-screen w-screen overflow-hidden">
+      <TimerProgressBar timer={timer} />
       <TopToolbar
+        timer={timer}
         projectId={projectId}
         onProjectIdChange={handleProjectIdChange}
         onToggleAnalysis={toggleAnalysis}
@@ -93,7 +100,9 @@ function AppContent() {
 export default function App() {
   return (
     <ReactFlowProvider>
-      <AppContent />
+      <TimerProvider>
+        <AppContent />
+      </TimerProvider>
     </ReactFlowProvider>
   )
 }
