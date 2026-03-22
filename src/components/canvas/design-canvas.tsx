@@ -1,4 +1,4 @@
-import { useCallback, useRef, useMemo, useState, useEffect } from 'react'
+import { useCallback, useRef, useMemo, useEffect } from 'react'
 import {
   ReactFlow,
   Background,
@@ -11,6 +11,7 @@ import {
 } from '@xyflow/react'
 import { useFlowStore } from '@/store/use-flow-store'
 import { useUndoStore } from '@/store/use-undo-store'
+import { useSpacePan } from '@/hooks/use-space-pan'
 import { SystemNodeMemo } from './system-node'
 import { GroupNodeMemo } from './group-node'
 import { DecisionNodeMemo } from './decision-node'
@@ -56,31 +57,7 @@ export function DesignCanvas() {
     []
   )
 
-  const [isSpacePressed, setIsSpacePressed] = useState(false)
-
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      // Trigger pan mode when space is pressed, but don't interfere with typing in inputs
-      if (e.code === 'Space') {
-        const tag = (e.target as HTMLElement).tagName
-        if (tag === 'INPUT' || tag === 'TEXTAREA' || (e.target as HTMLElement).isContentEditable) return
-        e.preventDefault()
-        setIsSpacePressed(true)
-      }
-    }
-    const handleKeyUp = (e: KeyboardEvent) => {
-      if (e.code === 'Space') {
-        setIsSpacePressed(false)
-      }
-    }
-
-    window.addEventListener('keydown', handleKeyDown)
-    window.addEventListener('keyup', handleKeyUp)
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown)
-      window.removeEventListener('keyup', handleKeyUp)
-    }
-  }, [])
+  const isSpacePressed = useSpacePan()
 
   // Native double click listener for the pane since React Flow synthetic events swallow it
   useEffect(() => {

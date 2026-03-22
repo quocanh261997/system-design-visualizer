@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react'
+import { useMountEffect } from './use-mount-effect'
 import { useFlowStore } from '@/store/use-flow-store'
 import { useWorkspaceStore } from '@/store/use-workspace-store'
 import { useNotesStore } from '@/store/use-notes-store'
@@ -16,7 +17,7 @@ export function useAutoSave(projectId: string | null) {
     savedIdRef.current = projectId
   }, [projectId])
 
-  useEffect(() => {
+  useMountEffect(() => {
     const interval = setInterval(async () => {
       try {
         const { nodes, edges, projectName } = useFlowStore.getState()
@@ -53,7 +54,7 @@ export function useAutoSave(projectId: string | null) {
     }, AUTO_SAVE_INTERVAL)
 
     return () => clearInterval(interval)
-  }, [])
+  })
 
   return savedIdRef
 }

@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef, useState, useEffect } from 'react'
+import { useCallback, useMemo, useRef, useState } from 'react'
 import {
   ReactFlow,
   Background,
@@ -15,6 +15,7 @@ import {
   type Edge,
 } from '@xyflow/react'
 import { useSchemaStore } from '@/store/use-schema-store'
+import { useSpacePan } from '@/hooks/use-space-pan'
 import { TableNodeMemo, type TableNode } from './table-node'
 import { RelationshipEdgeMemo, type RelationshipEdge } from './relationship-edge'
 
@@ -33,29 +34,9 @@ export function SchemaCanvas() {
   const removeRelationship = useSchemaStore((s) => s.removeRelationship)
   const rfInstance = useRef<ReactFlowInstance<TableNode, RelationshipEdge> | null>(null)
 
-  const [isSpacePressed, setIsSpacePressed] = useState(false)
+  const isSpacePressed = useSpacePan()
   const [selectedNodeIds, setSelectedNodeIds] = useState<Set<string>>(new Set())
   const [selectedEdgeIds, setSelectedEdgeIds] = useState<Set<string>>(new Set())
-
-  useEffect(() => {
-    const onKeyDown = (e: KeyboardEvent) => {
-      if (e.code === 'Space') {
-        const tag = (e.target as HTMLElement).tagName
-        if (tag === 'INPUT' || tag === 'TEXTAREA' || (e.target as HTMLElement).isContentEditable) return
-        e.preventDefault()
-        setIsSpacePressed(true)
-      }
-    }
-    const onKeyUp = (e: KeyboardEvent) => {
-      if (e.code === 'Space') setIsSpacePressed(false)
-    }
-    window.addEventListener('keydown', onKeyDown)
-    window.addEventListener('keyup', onKeyUp)
-    return () => {
-      window.removeEventListener('keydown', onKeyDown)
-      window.removeEventListener('keyup', onKeyUp)
-    }
-  }, [])
 
   const nodes: TableNode[] = useMemo(
     () =>
