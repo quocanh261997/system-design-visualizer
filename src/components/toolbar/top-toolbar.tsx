@@ -18,6 +18,7 @@ import { useFlowStore } from '@/store/use-flow-store'
 import { useUndoStore } from '@/store/use-undo-store'
 import { useWorkspaceStore } from '@/store/use-workspace-store'
 import { useNotesStore } from '@/store/use-notes-store'
+import { useEstimationStore } from '@/store/use-estimation-store'
 import { saveProject, exportProjectJson, importProjectJson } from '@/lib/persistence'
 import { WORKSPACE_TABS } from '@/types'
 import { exportAsPng, exportAsSvg, exportAsPdf } from '@/lib/export-canvas'
@@ -61,6 +62,7 @@ export function TopToolbar({
         existingId: projectId ?? undefined,
         activeTab,
         notes: useNotesStore.getState().notes,
+        estimations: useEstimationStore.getState().data,
       })
       onProjectIdChange(id)
       setSaveStatus('Saved!')
@@ -124,6 +126,7 @@ export function TopToolbar({
         const data = importProjectJson(text)
         loadProject(data.nodes, data.edges, data.name)
         if (data.notes) useNotesStore.getState().loadNotes(data.notes)
+        if (data.estimations) useEstimationStore.getState().loadEstimation(data.estimations)
         if (data.activeTab && WORKSPACE_TABS.some((t) => t.id === data.activeTab)) {
           useWorkspaceStore.getState().setActiveTab(data.activeTab as 'architecture')
         }
@@ -250,7 +253,7 @@ export function TopToolbar({
         </button>
 
         <div className="w-px h-5 mx-1" style={{ backgroundColor: 'var(--color-border)' }} />
-        <button onClick={() => { clear(); useNotesStore.getState().clear() }} className={btnClass} title="Clear canvas">
+        <button onClick={() => { clear(); useNotesStore.getState().clear(); useEstimationStore.getState().resetAll() }} className={btnClass} title="Clear canvas">
           <Trash2 size={14} /> Clear
         </button>
         <button onClick={onOpenShortcuts} className={btnClass} title="Keyboard shortcuts">

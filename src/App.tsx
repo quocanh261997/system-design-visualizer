@@ -10,6 +10,7 @@ import { useKeyboardShortcuts } from '@/hooks/use-keyboard-shortcuts'
 import { useFlowStore } from '@/store/use-flow-store'
 import { useWorkspaceStore } from '@/store/use-workspace-store'
 import { useNotesStore } from '@/store/use-notes-store'
+import { useEstimationStore } from '@/store/use-estimation-store'
 import { loadProject } from '@/lib/persistence'
 
 const LAST_PROJECT_KEY = 'sdb-last-project-id'
@@ -37,6 +38,7 @@ function AppContent() {
       if (data) {
         useFlowStore.getState().loadProject(data.nodes, data.edges, data.name)
         if (data.notes) useNotesStore.getState().loadNotes(data.notes)
+        if (data.estimations) useEstimationStore.getState().loadEstimation(data.estimations)
         useWorkspaceStore.getState().setActiveTab(
           (data.activeTab as 'architecture') ?? 'architecture'
         )

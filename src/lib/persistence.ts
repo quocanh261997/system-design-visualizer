@@ -1,9 +1,10 @@
 import Dexie, { type EntityTable } from 'dexie'
 import { v4 as uuid } from 'uuid'
-import type { ProjectData, SystemNode, SystemEdge, ProjectNotes } from '@/types'
+import type { ProjectData, SystemNode, SystemEdge, ProjectNotes, EstimationData } from '@/types'
 import {
   DEFAULT_PROJECT_NOTES,
   DEFAULT_NON_FUNCTIONAL_TARGETS,
+  DEFAULT_ESTIMATION_DATA,
   DEFAULT_DATABASE_SCHEMA,
   DEFAULT_API_CONTRACT,
   DEFAULT_SEQUENCE_DIAGRAM,
@@ -60,6 +61,16 @@ class SDBDatabase extends Dexie {
         }
       })
     })
+
+    this.version(4).stores({
+      projects: 'id, name, updatedAt',
+    }).upgrade((tx) => {
+      return tx.table('projects').toCollection().modify((project) => {
+        if (Array.isArray(project.estimations)) {
+          project.estimations = { presetId: null, sections: [], customNotes: '' }
+        }
+      })
+    })
   }
 }
 
@@ -78,7 +89,9 @@ function withDefaults(project: ProjectData): ProjectData {
         ...(notes as ProjectNotes).nonFunctionalTargets,
       },
     },
-    estimations: project.estimations ?? [],
+    estimations: project.estimations && typeof project.estimations === 'object' && !Array.isArray(project.estimations)
+      ? project.estimations
+      : { ...DEFAULT_ESTIMATION_DATA },
     schemas: project.schemas ?? { ...DEFAULT_DATABASE_SCHEMA },
     apiContracts: project.apiContracts ?? { ...DEFAULT_API_CONTRACT },
     sequences: project.sequences ?? { ...DEFAULT_SEQUENCE_DIAGRAM },
@@ -93,11 +106,12 @@ export interface SaveProjectOptions {
   existingId?: string
   activeTab?: string
   notes?: ProjectNotes
+  estimations?: EstimationData
 }
 
 /** Save current project to IndexedDB */
 export async function saveProject(opts: SaveProjectOptions): Promise<string> {
-  const { nodes, edges, name, existingId, activeTab, notes } = opts
+  const { nodes, edges, name, existingId, activeTab, notes, estimations } = opts
   const now = new Date().toISOString()
   const id = existingId ?? uuid()
 
@@ -110,7 +124,7 @@ export async function saveProject(opts: SaveProjectOptions): Promise<string> {
     nodes,
     edges,
     notes: notes ?? existing?.notes ?? { ...DEFAULT_PROJECT_NOTES },
-    estimations: existing?.estimations ?? [],
+    estimations: estimations ?? existing?.estimations ?? { ...DEFAULT_ESTIMATION_DATA },
     schemas: existing?.schemas ?? { ...DEFAULT_DATABASE_SCHEMA },
     apiContracts: existing?.apiContracts ?? { ...DEFAULT_API_CONTRACT },
     sequences: existing?.sequences ?? { ...DEFAULT_SEQUENCE_DIAGRAM },
@@ -154,7 +168,7 @@ export function exportProjectJson(
     nodes,
     edges,
     notes: notes ?? { ...DEFAULT_PROJECT_NOTES },
-    estimations: [],
+    estimations: { ...DEFAULT_ESTIMATION_DATA },
     schemas: { ...DEFAULT_DATABASE_SCHEMA },
     apiContracts: { ...DEFAULT_API_CONTRACT },
     sequences: { ...DEFAULT_SEQUENCE_DIAGRAM },

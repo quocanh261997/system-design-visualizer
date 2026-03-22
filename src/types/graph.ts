@@ -108,13 +108,44 @@ export interface ProjectNotes {
   freeformNotes: string
 }
 
-/** Placeholder for estimation rows (refined in Phase 3) */
-export interface EstimationRow {
+export interface EstimationInput {
+  id: string
+  label: string
+  value: number | null
+  unit: string
+  hint?: string
+  isOverridden: boolean
+}
+
+export interface EstimationFormula {
   id: string
   label: string
   formula: string
-  value: number
+  inputs: string[]
   unit: string
+  result: number | null
+  isOverridden: boolean
+}
+
+export type EstimationSectionId = 'traffic' | 'storage' | 'bandwidth' | 'cache'
+
+export interface EstimationSection {
+  id: EstimationSectionId
+  title: string
+  inputs: EstimationInput[]
+  formulas: EstimationFormula[]
+}
+
+export interface EstimationData {
+  presetId: string | null
+  sections: EstimationSection[]
+  customNotes: string
+}
+
+export const DEFAULT_ESTIMATION_DATA: EstimationData = {
+  presetId: null,
+  sections: [],
+  customNotes: '',
 }
 
 /** Placeholder for database schema (refined in Phase 4) */
@@ -162,7 +193,7 @@ export interface ProjectData {
   nodes: SystemNode[]
   edges: SystemEdge[]
   notes?: ProjectNotes
-  estimations?: EstimationRow[]
+  estimations?: EstimationData
   schemas?: DatabaseSchema
   apiContracts?: ApiContract
   sequences?: SequenceDiagram

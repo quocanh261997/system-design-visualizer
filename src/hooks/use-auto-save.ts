@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react'
 import { useFlowStore } from '@/store/use-flow-store'
 import { useWorkspaceStore } from '@/store/use-workspace-store'
 import { useNotesStore } from '@/store/use-notes-store'
+import { useEstimationStore } from '@/store/use-estimation-store'
 import { saveProject } from '@/lib/persistence'
 
 const AUTO_SAVE_INTERVAL = 30_000 // 30 seconds
@@ -22,6 +23,7 @@ export function useAutoSave(projectId: string | null) {
 
         const { activeTab } = useWorkspaceStore.getState()
         const { notes } = useNotesStore.getState()
+        const { data: estimations } = useEstimationStore.getState()
         const id = await saveProject({
           nodes,
           edges,
@@ -29,6 +31,7 @@ export function useAutoSave(projectId: string | null) {
           existingId: savedIdRef.current ?? undefined,
           activeTab,
           notes,
+          estimations,
         })
         savedIdRef.current = id
         localStorage.setItem('sdb-last-project-id', id)

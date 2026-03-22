@@ -4,7 +4,7 @@ import { SchemaTabPlaceholder } from '@/components/tabs/schema-tab-placeholder'
 import { ApiTabPlaceholder } from '@/components/tabs/api-tab-placeholder'
 import { SequenceTabPlaceholder } from '@/components/tabs/sequence-tab-placeholder'
 import { NotesTab } from '@/components/tabs/notes-tab'
-import { EstimationTabPlaceholder } from '@/components/tabs/estimation-tab-placeholder'
+import { EstimationTab } from '@/components/tabs/estimation-tab'
 
 interface WorkspaceContentProps {
   showAnalysis: boolean
@@ -26,7 +26,7 @@ export function WorkspaceContent({ showAnalysis, onCloseAnalysis }: WorkspaceCon
     case 'notes':
       return <NotesTab />
     case 'estimation':
-      return <EstimationTabPlaceholder />
+      return <EstimationTab />
     default:
       return <ArchitectureTab showAnalysis={showAnalysis} onCloseAnalysis={onCloseAnalysis} />
   }
