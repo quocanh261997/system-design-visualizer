@@ -1,4 +1,5 @@
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback } from 'react'
+import { useMountEffect } from '@/hooks/use-mount-effect'
 import { ReactFlowProvider } from '@xyflow/react'
 import { TopToolbar } from '@/components/toolbar/top-toolbar'
 import { WorkspaceTabs } from '@/components/workspace/workspace-tabs'
@@ -35,7 +36,7 @@ function AppContent() {
   }, [])
 
   // Load last project from IndexedDB on startup
-  useEffect(() => {
+  useMountEffect(() => {
     const lastId = localStorage.getItem(LAST_PROJECT_KEY)
     if (!lastId) return
     loadProject(lastId).then((data) => {
@@ -58,7 +59,7 @@ function AppContent() {
       localStorage.removeItem(LAST_PROJECT_KEY)
       setShowTemplates(true)
     })
-  }, [handleProjectIdChange])
+  })
 
   const toggleAnalysis = useCallback(() => setShowAnalysis((v) => !v), [])
   const openTemplates = useCallback(() => setShowTemplates(true), [])
