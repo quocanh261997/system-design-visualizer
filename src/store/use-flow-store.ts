@@ -36,6 +36,9 @@ interface FlowState {
   deleteSelected: () => void
   addGroup: (position: { x: number; y: number }, groupType?: string, label?: string) => void
   addTextNode: (position: { x: number; y: number }, text: string) => void
+  addNodes: (nodes: SystemNode[]) => void
+  addEdges: (edges: SystemEdge[]) => void
+  deselectAll: () => void
   setProjectName: (name: string) => void
   loadProject: (nodes: SystemNode[], edges: SystemEdge[], name?: string) => void
   clear: () => void
@@ -194,6 +197,22 @@ export const useFlowStore = create<FlowState>((set, get) => ({
       },
     }
     set({ nodes: [...get().nodes, node] })
+  },
+
+  addNodes: (newNodes) => {
+    set({ nodes: [...get().nodes, ...newNodes] })
+  },
+
+  addEdges: (newEdges) => {
+    set({ edges: [...get().edges, ...newEdges] })
+  },
+
+  deselectAll: () => {
+    set({
+      nodes: get().nodes.map((n) => (n.selected ? { ...n, selected: false } : n)),
+      selectedNodeId: null,
+      selectedEdgeId: null,
+    })
   },
 
   setProjectName: (name) => set({ projectName: name }),

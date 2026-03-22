@@ -3,6 +3,7 @@ import { useFlowStore } from '@/store/use-flow-store'
 import { useUndoStore } from '@/store/use-undo-store'
 import { useWorkspaceStore } from '@/store/use-workspace-store'
 import { WORKSPACE_TABS } from '@/types'
+import { copyToClipboard, pasteFromClipboard } from '@/lib/clipboard'
 
 interface ShortcutOptions {
   onToggleAnalysis: () => void
@@ -48,6 +49,35 @@ export function useKeyboardShortcuts({
       if ((meta && e.shiftKey && e.key === 'z') || (meta && e.key === 'y')) {
         e.preventDefault()
         useUndoStore.getState().redo()
+        return
+      }
+
+      // Ctrl/Cmd+C: Copy selected nodes
+      if (meta && e.key === 'c' && !isInput) {
+        const { nodes, edges, selectedNodeId } = useFlowStore.getState()
+        let selected = nodes.filter((n) => n.selected)
+        if (selected.length === 0 && selectedNodeId) {
+          const single = nodes.find((n) => n.id === selectedNodeId)
+          if (single) selected = [single]
+        }
+        if (selected.length > 0) {
+          e.preventDefault()
+          copyToClipboard(selected, edges)
+        }
+        return
+      }
+
+      // Ctrl/Cmd+V: Paste nodes
+      if (meta && e.key === 'v' && !isInput) {
+        const result = pasteFromClipboard()
+        if (result) {
+          e.preventDefault()
+          useUndoStore.getState().snapshot()
+          const store = useFlowStore.getState()
+          store.deselectAll()
+          store.addNodes(result.nodes)
+          store.addEdges(result.edges)
+        }
         return
       }
 
@@ -104,6 +134,8 @@ export function useKeyboardShortcuts({
 /** Shortcut reference data for help display */
 export const SHORTCUT_MAP = [
   { keys: ['Ctrl', 'S'], action: 'Save project' },
+  { keys: ['Ctrl', 'C'], action: 'Copy selected nodes' },
+  { keys: ['Ctrl', 'V'], action: 'Paste nodes' },
   { keys: ['Ctrl', 'Z'], action: 'Undo' },
   { keys: ['Ctrl', 'Shift', 'Z'], action: 'Redo' },
   { keys: ['Delete'], action: 'Delete selected' },
