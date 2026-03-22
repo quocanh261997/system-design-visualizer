@@ -1,4 +1,4 @@
-import { useCallback } from 'react'
+import { useCallback, useId } from 'react'
 import { formatNumber } from './estimation-utils'
 
 interface EstimationInputFieldProps {
@@ -10,6 +10,7 @@ interface EstimationInputFieldProps {
 }
 
 export function EstimationInputField({ label, value, unit, hint, onChange }: EstimationInputFieldProps) {
+  const inputId = useId()
   const handleChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const raw = e.target.value.replace(/,/g, '')
@@ -26,6 +27,7 @@ export function EstimationInputField({ label, value, unit, hint, onChange }: Est
   return (
     <div className="flex items-center gap-3 py-1.5">
       <label
+        htmlFor={inputId}
         className="text-xs w-48 shrink-0 flex flex-col"
         style={{ color: 'var(--color-text-secondary)' }}
       >
@@ -37,6 +39,7 @@ export function EstimationInputField({ label, value, unit, hint, onChange }: Est
         )}
       </label>
       <input
+        id={inputId}
         type="text"
         inputMode="decimal"
         className="w-40 px-2.5 py-1.5 rounded-lg text-xs text-right outline-none transition-colors focus:ring-1"

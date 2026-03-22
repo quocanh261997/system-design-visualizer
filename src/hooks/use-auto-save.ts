@@ -19,11 +19,19 @@ export function useAutoSave(projectId: string | null) {
     const interval = setInterval(async () => {
       try {
         const { nodes, edges, projectName } = useFlowStore.getState()
-        if (nodes.length === 0 && edges.length === 0) return
-
         const { activeTab } = useWorkspaceStore.getState()
         const { notes } = useNotesStore.getState()
         const { data: estimations } = useEstimationStore.getState()
+
+        const hasCanvas = nodes.length > 0 || edges.length > 0
+        const hasEstimation = estimations.sections.some(
+          (s) => s.inputs.some((i) => i.value !== null)
+        )
+        const hasNotes = notes.freeformNotes.trim() !== '' ||
+          notes.functionalRequirements.length > 0 ||
+          notes.assumptions.length > 0 ||
+          notes.tradeoffs.length > 0
+        if (!hasCanvas && !hasEstimation && !hasNotes) return
         const id = await saveProject({
           nodes,
           edges,

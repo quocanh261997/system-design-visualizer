@@ -81,7 +81,7 @@ export function TopToolbar({
 
   const handleExportJson = useCallback(() => {
     const { activeTab } = useWorkspaceStore.getState()
-    const json = exportProjectJson(nodes, edges, projectName, activeTab, useNotesStore.getState().notes)
+    const json = exportProjectJson(nodes, edges, projectName, activeTab, useNotesStore.getState().notes, useEstimationStore.getState().data)
     const blob = new Blob([json], { type: 'application/json' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')

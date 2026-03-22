@@ -36,21 +36,25 @@ export function EstimationSection({ section }: EstimationSectionProps) {
       className="rounded-lg border"
       style={{ borderColor: 'var(--color-border)', backgroundColor: 'var(--color-sidebar-bg)' }}
     >
-      <button
-        onClick={() => setCollapsed(!collapsed)}
-        className="flex items-center gap-2 w-full px-4 py-3 text-left text-sm font-semibold"
+      <div
+        className="flex items-center gap-2 w-full px-4 py-3 text-sm font-semibold"
         style={{ color: 'var(--color-text-primary)' }}
       >
-        {collapsed ? <ChevronRight size={16} /> : <ChevronDown size={16} />}
-        {section.title}
+        <button
+          onClick={() => setCollapsed(!collapsed)}
+          className="flex items-center gap-2 flex-1 text-left"
+        >
+          {collapsed ? <ChevronRight size={16} /> : <ChevronDown size={16} />}
+          {section.title}
+        </button>
         <button
           onClick={handleReset}
-          className="ml-auto p-1 rounded hover:bg-white/10 transition-colors"
+          className="p-1 rounded hover:bg-white/10 transition-colors"
           title="Reset section"
         >
           <RotateCcw size={12} style={{ color: 'var(--color-text-muted)' }} />
         </button>
-      </button>
+      </div>
       {!collapsed && (
         <div className="px-4 pb-4 space-y-1">
           {section.inputs.map((inp) => (

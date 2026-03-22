@@ -76,6 +76,12 @@ class SDBDatabase extends Dexie {
 
 export const db = new SDBDatabase()
 
+function isValidEstimationData(data: unknown): data is EstimationData {
+  if (!data || typeof data !== 'object' || Array.isArray(data)) return false
+  const d = data as Record<string, unknown>
+  return Array.isArray(d.sections) && typeof d.customNotes === 'string'
+}
+
 /** Apply defaults to a loaded project for backward compatibility */
 function withDefaults(project: ProjectData): ProjectData {
   const notes = project.notes ?? { ...DEFAULT_PROJECT_NOTES }
@@ -89,7 +95,7 @@ function withDefaults(project: ProjectData): ProjectData {
         ...(notes as ProjectNotes).nonFunctionalTargets,
       },
     },
-    estimations: project.estimations && typeof project.estimations === 'object' && !Array.isArray(project.estimations)
+    estimations: isValidEstimationData(project.estimations)
       ? project.estimations
       : { ...DEFAULT_ESTIMATION_DATA },
     schemas: project.schemas ?? { ...DEFAULT_DATABASE_SCHEMA },
@@ -159,7 +165,8 @@ export function exportProjectJson(
   edges: SystemEdge[],
   name: string,
   activeTab?: string,
-  notes?: ProjectNotes
+  notes?: ProjectNotes,
+  estimations?: EstimationData
 ): string {
   const project: ProjectData = {
     id: uuid(),
@@ -168,7 +175,7 @@ export function exportProjectJson(
     nodes,
     edges,
     notes: notes ?? { ...DEFAULT_PROJECT_NOTES },
-    estimations: { ...DEFAULT_ESTIMATION_DATA },
+    estimations: estimations ?? { ...DEFAULT_ESTIMATION_DATA },
     schemas: { ...DEFAULT_DATABASE_SCHEMA },
     apiContracts: { ...DEFAULT_API_CONTRACT },
     sequences: { ...DEFAULT_SEQUENCE_DIAGRAM },
