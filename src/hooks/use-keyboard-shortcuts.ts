@@ -8,12 +8,14 @@ import { copyToClipboard, pasteFromClipboard } from '@/lib/clipboard'
 interface ShortcutOptions {
   onToggleAnalysis: () => void
   onOpenTemplates: () => void
+  onToggleTimer: () => void
 }
 
 /** Centralized keyboard shortcut handler */
 export function useKeyboardShortcuts({
   onToggleAnalysis,
   onOpenTemplates,
+  onToggleTimer,
 }: ShortcutOptions) {
   const handleKeyDown = useCallback(
     async (e: KeyboardEvent) => {
@@ -113,6 +115,13 @@ export function useKeyboardShortcuts({
         return
       }
 
+      // Ctrl/Cmd+Shift+T: Toggle interview timer
+      if (meta && e.shiftKey && (e.key === 't' || e.key === 'T') && !isInput) {
+        e.preventDefault()
+        onToggleTimer()
+        return
+      }
+
       // Ctrl/Cmd+T: Open templates
       if (meta && e.key === 't') {
         e.preventDefault()
@@ -127,7 +136,7 @@ export function useKeyboardShortcuts({
         return
       }
     },
-    [onToggleAnalysis, onOpenTemplates]
+    [onToggleAnalysis, onOpenTemplates, onToggleTimer]
   )
 
   useEffect(() => {
@@ -147,6 +156,7 @@ export const SHORTCUT_MAP = [
   { keys: ['Escape'], action: 'Deselect all' },
   { keys: ['G'], action: 'Add group boundary' },
   { keys: ['Ctrl', 'T'], action: 'Open templates' },
+  { keys: ['Ctrl', 'Shift', 'T'], action: 'Toggle interview timer' },
   { keys: ['Ctrl', 'Shift', 'A'], action: 'Toggle analysis' },
   { keys: ['Ctrl', '1-6'], action: 'Switch workspace tab' },
 ]

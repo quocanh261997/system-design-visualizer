@@ -23,6 +23,8 @@ import { useSchemaStore } from '@/store/use-schema-store'
 import { saveProject, exportProjectJson, importProjectJson } from '@/lib/persistence'
 import { WORKSPACE_TABS } from '@/types'
 import { exportAsPng, exportAsSvg, exportAsPdf } from '@/lib/export-canvas'
+import { TimerControls } from '@/components/timer/timer-controls'
+import type { UseInterviewTimerReturn } from '@/hooks/use-interview-timer'
 
 interface TopToolbarProps {
   projectId: string | null
@@ -31,6 +33,7 @@ interface TopToolbarProps {
   onOpenTemplates: () => void
   onOpenShortcuts: () => void
   analysisOpen: boolean
+  timer: UseInterviewTimerReturn
 }
 
 /** Top toolbar with project name, save/load, export, analysis, and templates */
@@ -41,6 +44,7 @@ export function TopToolbar({
   onOpenTemplates,
   onOpenShortcuts,
   analysisOpen,
+  timer,
 }: TopToolbarProps) {
   const projectName = useFlowStore((s) => s.projectName)
   const setProjectName = useFlowStore((s) => s.setProjectName)
@@ -254,6 +258,10 @@ export function TopToolbar({
         >
           <Redo2 size={14} />
         </button>
+
+        <div className="w-px h-5 mx-1" style={{ backgroundColor: 'var(--color-border)' }} />
+
+        <TimerControls timer={timer} />
 
         <div className="w-px h-5 mx-1" style={{ backgroundColor: 'var(--color-border)' }} />
         <button onClick={() => { clear(); useNotesStore.getState().clear(); useEstimationStore.getState().resetAll(); useSchemaStore.getState().clear() }} className={btnClass} title="Clear canvas">
