@@ -14,6 +14,7 @@ function getAudioContext(): AudioContext | null {
 export function playBeep(frequency = 800, duration = 200): void {
   const ctx = getAudioContext()
   if (!ctx) return
+  if (ctx.state === 'suspended') ctx.resume()
 
   const oscillator = ctx.createOscillator()
   const gain = ctx.createGain()

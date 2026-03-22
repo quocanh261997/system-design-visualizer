@@ -116,7 +116,7 @@ export function useKeyboardShortcuts({
       }
 
       // Ctrl/Cmd+Shift+T: Toggle interview timer
-      if (meta && e.shiftKey && (e.key === 't' || e.key === 'T')) {
+      if (meta && e.shiftKey && (e.key === 't' || e.key === 'T') && !isInput) {
         e.preventDefault()
         onToggleTimer()
         return

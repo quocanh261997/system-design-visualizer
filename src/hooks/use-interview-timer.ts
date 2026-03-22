@@ -136,6 +136,7 @@ export function useInterviewTimer(
   }, [])
 
   const resume = useCallback(() => {
+    if (hasExpiredRef.current) return
     setIsRunning(true)
     setIsPaused(false)
   }, [])
