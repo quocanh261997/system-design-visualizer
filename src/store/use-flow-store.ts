@@ -210,6 +210,7 @@ export const useFlowStore = create<FlowState>((set, get) => ({
   deselectAll: () => {
     set({
       nodes: get().nodes.map((n) => (n.selected ? { ...n, selected: false } : n)),
+      edges: get().edges.map((e) => (e.selected ? { ...e, selected: false } : e)),
       selectedNodeId: null,
       selectedEdgeId: null,
     })

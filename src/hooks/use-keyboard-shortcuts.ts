@@ -18,8 +18,13 @@ export function useKeyboardShortcuts({
   const handleKeyDown = useCallback(
     async (e: KeyboardEvent) => {
       const meta = e.metaKey || e.ctrlKey
-      const active = document.activeElement
-      const isInput = active?.tagName === 'INPUT' || active?.tagName === 'TEXTAREA' || active?.tagName === 'SELECT'
+      const active = document.activeElement as HTMLElement | null
+      const isInput =
+        active?.tagName === 'INPUT' ||
+        active?.tagName === 'TEXTAREA' ||
+        active?.tagName === 'SELECT' ||
+        !!active?.isContentEditable ||
+        !!active?.closest?.('[contenteditable="true"]')
 
       // Ctrl/Cmd+1-6: Switch workspace tabs
       if (meta && !e.shiftKey && e.key >= '1' && e.key <= '6' && !isInput) {
