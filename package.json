@@ -28,7 +28,7 @@
     "react-dom": "^19.2.4",
     "simple-icons": "^16.11.0",
     "tailwindcss": "^4.2.1",
-    "zustand": "^5.0.11"
+    "zustand": "^5.0.12"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.4",
